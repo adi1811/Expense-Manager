@@ -1,0 +1,422 @@
+---
+# ====== Page: Balance =======================================
+id: 5
+identification: 
+  name: Balance
+  alias: BALANCE
+  title: Balance
+
+appearance: 
+  page-mode: Modal Dialog
+  dialog-template: Theme Default
+  template-options: 
+  - '#DEFAULT#'
+
+dialog: 
+  chained: true
+  resizable: true
+
+navigation-menu: 
+  override-user-interface-level: false
+
+navigation: 
+  cursor-focus: Do not focus cursor
+  warn-on-unsaved-changes: true
+
+javascript: 
+  execute-when-page-loads: |
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+    
+    for (i = 0; i < acc.length; i++) {
+      acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.maxHeight) {
+          panel.style.maxHeight = null;
+        } else {
+          panel.style.maxHeight = panel.scrollHeight + "px";
+        } 
+      });
+    }
+
+css: 
+  inline: |2
+     .accordion {
+        background-color: #fcfbfa;
+        color: #444;
+        cursor: pointer;
+        padding: 18px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+        transition: 0.4s;
+      }
+      
+      .active, .accordion:hover {
+        background-color: #f4f4f4;
+      }
+      
+      .panel {
+        padding: 0 18px;
+        background-color: white;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease-out;
+      }
+      
+      .ul-sql {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .ul-sql .li-sql {
+        border: 1px solid #ddd;
+        margin-top: -1px; /* Prevent double borders */
+        padding: 12px;
+      }
+
+security: 
+  authentication: Page Requires Authentication
+  deep-linking: Application Default
+  page-access-protection: Arguments Must Have Checksum
+  form-auto-complete: Off
+  browser-cache: Application Default
+
+session-management: 
+  rejoin-sessions: Application Default
+
+advanced: 
+  enable-duplicate-page-submissions: Yes - Enable page to be re-posted
+  reload-on-submit: Only for Success
+
+server-cache: 
+  caching: Disabled
+
+regions: 
+- # ====== Region: Balance =====================================
+  id: 154784943035625212047
+  identification: 
+    name: Balance
+    title: Balance
+    type: Dynamic Content
+
+  source: 
+    language: PL/SQL
+    pl/sql-function-body-returning-a-clob: |
+      --------------------------------Balances---------------------------------------
+      DECLARE
+          l_prompt_1            VARCHAR2(20);
+          l_prompt_2            VARCHAR2(20);
+          l_prompt_3            VARCHAR2(20);
+          l_prompt_4            VARCHAR2(20);
+          l_prompt_5            VARCHAR2(20);
+          l_individual_amount   NUMBER(12,2);
+          l_shared_amount       NUMBER(12,2);
+      	l_clob				  Clob := EMPTY_CLOB();
+      ---Individual Balance
+          CURSOR c_individual_balance IS
+              SELECT
+                  borrower_user_id AS user_id,
+                  ( lending_amount - borrow_amount ) AS amount
+              FROM
+                  (
+                      SELECT borrower_user_id,SUM(borrow_amount) AS borrow_amount
+                      FROM amount_detail
+                      WHERE group_id =:p8_group_id
+                          AND borrower_user_id <> lender_user_id
+                          AND lender_user_id IN (SELECT user_id FROM user_group WHERE group_id =:p8_group_id )
+                      GROUP BY borrower_user_id
+      				
+                      UNION
+      				
+                      SELECT user_id AS borrower_user_id,0 AS borrow_amount
+                      FROM user_group
+                      WHERE user_id NOT IN ( SELECT borrower_user_id FROM amount_detail WHERE group_id =:p8_group_id AND  borrower_user_id <> lender_user_id
+                                      AND borrower_user_id IN ( SELECT user_id FROM user_group WHERE group_id =:p8_group_id))
+                          AND group_id =:p8_group_id
+                  ),
+                  (
+                      SELECT lender_user_id, SUM(lending_amount) AS lending_amount
+                      FROM amount_detail
+                      WHERE group_id =:p8_group_id
+                          AND lender_user_id <> borrower_user_id
+                          AND borrower_user_id IN ( SELECT user_id FROM user_group WHERE group_id =:p8_group_id )
+                      GROUP BY lender_user_id
+      				
+                      UNION
+      				
+                      SELECT user_id AS lender_user_id, 0 AS lending_amount
+                      FROM user_group
+                      WHERE user_id NOT IN ( SELECT lender_user_id
+                                  FROM amount_detail
+                                  WHERE group_id =:p8_group_id
+                                      AND lender_user_id <> borrower_user_id
+                                      AND lender_user_id IN ( SELECT user_id FROM user_group
+                                              WHERE group_id =:p8_group_id )
+                              )  AND group_id =:p8_group_id
+                  ) WHERE borrower_user_id = lender_user_id;
+      
+      ---Shared Balance
+      
+          CURSOR c_shared_balance ( p_user_id NUMBER ) IS
+              SELECT
+                  b.borrower_user_id AS user_id_1,
+                  ( l.lending_amount - b.borrow_amount ) AS amount,
+                  b.lender_user_id AS user_id_2
+      			 FROM 
+      		(SELECT borrower_user_id, SUM(borrow_amount) AS borrow_amount, lender_user_id
+                      FROM amount_detail
+                      WHERE  group_id =:p8_group_id
+      					AND borrower_user_id <> lender_user_id
+                          AND lender_user_id IN ( SELECT user_id FROM user_group WHERE group_id =:p8_group_id )
+                      GROUP BY borrower_user_id, lender_user_id
+      				
+                      UNION
+      				
+                      SELECT b.user_id AS borrower_user_id,
+                          0 AS borrow_amount,
+                          l.user_id AS lender_user_id
+                      FROM
+                          user_group b,
+                          user_group l
+                      WHERE  b.user_id <> l.user_id
+                          AND b.group_id =:p8_group_id
+                          AND l.group_id =:p8_group_id
+                          AND b.user_id NOT IN ( SELECT borrower_user_id FROM amount_detail
+                                  WHERE group_id =:p8_group_id
+                                      AND borrower_user_id <> lender_user_id
+                                      AND borrower_user_id IN ( SELECT user_id FROM user_group WHERE group_id =:p8_group_id )
+                              )
+                      UNION
+      				
+                      SELECT
+                          b.user_id AS borrower_user_id,
+                          0 AS borrow_amount,
+                          l.user_id AS lender_user_id
+                      FROM
+                          user_group b, user_group l
+                      WHERE  b.user_id <> l.user_id
+                          AND  b.group_id =:p8_group_id
+                          AND l.group_id =:p8_group_id
+                          AND  b.group_id =:p8_group_id
+                          AND l.user_id NOT IN ( SELECT lender_user_id FROM amount_detail WHERE   group_id =:p8_group_id AND borrower_user_id <> lender_user_id
+      											AND borrower_user_id IN ( SELECT user_id FROM user_group WHERE group_id =:p8_group_id)
+      											)
+                  ) b,
+                  (
+                      SELECT
+                          lender_user_id,
+                          SUM(lending_amount) AS lending_amount,
+                          borrower_user_id
+                      FROM amount_detail
+                      WHERE group_id =:p8_group_id
+                          AND lender_user_id <> borrower_user_id
+                          AND borrower_user_id IN (SELECT user_id FROM user_group WHERE  group_id =:p8_group_id )
+                      GROUP BY
+                          lender_user_id, borrower_user_id
+                      
+      				UNION
+                      
+      				SELECT
+                          l.user_id AS lender_user_id,
+                          0 AS lending_amount,
+                          b.user_id AS borrower_user_id
+                      FROM
+                          user_group l,
+                          user_group b
+                      WHERE  l.user_id <> b.user_id
+                          AND l.group_id =:p8_group_id
+                          AND  b.group_id =:p8_group_id
+                          AND l.user_id NOT IN ( SELECT lender_user_id FROM  amount_detail WHERE   group_id =:p8_group_id AND  lender_user_id <> borrower_user_id
+      											AND lender_user_id IN ( SELECT user_id FROM user_group  WHERE  group_id =:p8_group_id)  )
+                      UNION
+                      
+      				SELECT
+                          l.user_id AS lender_user_id,
+                          0 AS lending_amount,
+                          b.user_id AS borrower_user_idborrower_user_id
+                      FROM
+                          user_group l,
+                          user_group b
+                      WHERE l.user_id <> b.user_id
+                          AND l.group_id =:p8_group_id
+                          AND b.user_id NOT IN (SELECT borrower_user_id FROM amount_detail
+                                  WHERE  group_id =:p8_group_id
+                                      AND   lender_user_id <> borrower_user_id
+                                      AND lender_user_id IN (   SELECT  user_id FROM user_group  WHERE group_id =:p8_group_id ) )
+                  ) l
+              WHERE   b.lender_user_id = l.borrower_user_id
+                  AND  b.borrower_user_id = l.lender_user_id
+                  AND b.borrower_user_id = p_user_id;
+      
+      BEGIN
+          FOR r_individual_balance IN c_individual_balance LOOP
+              IF
+                  r_individual_balance.amount > 0
+              THEN
+                  l_prompt_1 := ' gets back ';
+              ELSIF r_individual_balance.amount < 0 THEN
+                  l_prompt_1 := ' owes ';
+              ELSE
+                  l_prompt_1 := '';
+              END IF;
+      
+              IF
+                  r_individual_balance.amount <> 0
+              THEN
+                  l_prompt_2 := ' in total';
+              ELSE
+                  l_prompt_2 := ' is settled up';
+              END IF;
+      
+              IF
+                  r_individual_balance.amount <> 0
+              THEN
+                  l_individual_amount := abs(r_individual_balance.amount);
+              ELSE
+                  l_individual_amount := '';
+              END IF;
+      
+             l_clob := l_clob || '<button type ="button" class="accordion"><strong>'
+               || get_user_name(r_individual_balance.user_id)
+               || '</strong>'
+               || l_prompt_1
+               || '<strong>'
+               || l_individual_amount
+               || '</strong>'
+               || l_prompt_2
+               || '</button>';
+      
+              l_clob := l_clob || '<ul class="panel ul-sql">';
+              FOR r_shared_balance IN c_shared_balance(r_individual_balance.user_id) LOOP
+                  IF
+                      r_shared_balance.amount > 0
+                  THEN
+                      l_prompt_3 := ' gets back ';
+                  ELSIF r_shared_balance.amount < 0 THEN
+                      l_prompt_3 := ' owes ';
+                  ELSE
+                      l_prompt_3 := '';
+                  END IF;
+      
+                  IF
+                      r_shared_balance.amount > 0
+                  THEN
+                      l_prompt_4 := ' from ';
+                  ELSIF r_shared_balance.amount < 0 THEN
+                      l_prompt_4 := ' to ';
+                  ELSE
+                      l_prompt_4 := '';
+                  END IF;
+      
+                  IF
+                      r_shared_balance.amount <> 0
+                  THEN
+                      l_prompt_5 := ' in total';
+                  ELSE
+                      l_prompt_5 := ' is settled up';
+                  END IF;
+      
+                  IF
+                      r_shared_balance.amount <> 0
+                  THEN
+                      l_shared_amount := abs(r_shared_balance.amount);
+                  ELSE
+                      l_shared_amount := '';
+                  END IF;
+      
+                  IF
+                      l_shared_amount IS NOT NULL
+                  THEN
+                     l_clob := l_clob || '<li class="li-sql"><strong>'
+                       || get_user_name(r_shared_balance.user_id_1)
+                       || '</strong>'
+                       || l_prompt_3
+                       || '<strong>'
+                       || l_shared_amount
+                       || '</strong>'
+                       || l_prompt_4
+                       || '<strong>'
+                       || get_user_name(r_shared_balance.user_id_2)
+                       || '</strong>'
+                       || l_prompt_5
+                       || '</li>';
+                  END IF;
+      
+              END LOOP;
+      
+              l_clob := l_clob || '</ul>';
+          END LOOP;
+      	return l_clob;
+      END;
+
+  layout: 
+    sequence: 10
+    parent-region: No Parent
+    slot: BODY
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Standard
+    template-options: 
+    - '#DEFAULT#'
+    - t-Region--scrollBody
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  server-cache: 
+    caching: Disabled
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    performance: 
+      lazy-loading: false
+
+page-items: 
+- # ====== Page Item: P5_GROUP_ID ==============================
+  id: 154784943102651212048
+  identification: 
+    name: P5_GROUP_ID
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 10
+    region: Balance # 154784943035625212047
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Null
+    used: Only when current value in session state is null
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Session (Persistent)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+

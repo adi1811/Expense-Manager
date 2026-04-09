@@ -1,0 +1,1017 @@
+---
+# ====== Page: Add Expense ===================================
+id: 4
+identification: 
+  name: Add Expense
+  alias: ADD-EXPENSE
+  title: Add Expense
+
+appearance: 
+  page-mode: Modal Dialog
+  dialog-template: Theme Default
+  template-options: 
+  - '#DEFAULT#'
+
+dialog: 
+  chained: true
+  resizable: true
+
+navigation-menu: 
+  override-user-interface-level: false
+
+navigation: 
+  cursor-focus: Do not focus cursor
+  warn-on-unsaved-changes: true
+
+security: 
+  authentication: Page Requires Authentication
+  deep-linking: Application Default
+  page-access-protection: Arguments Must Have Checksum
+  form-auto-complete: Off
+  browser-cache: Application Default
+
+session-management: 
+  rejoin-sessions: Application Default
+
+advanced: 
+  enable-duplicate-page-submissions: Yes - Enable page to be re-posted
+  reload-on-submit: Only for Success
+
+server-cache: 
+  caching: Disabled
+
+regions: 
+- # ====== Region: Add Expense =================================
+  id: 154787834744827757470
+  identification: 
+    name: Add Expense
+    type: Form
+
+  source: 
+    location: Local Database
+    type: Table / View
+    table-owner: Parsing Schema
+    table-name: EXPENSE
+    include-rowid-column: false
+
+  layout: 
+    sequence: 10
+    parent-region: No Parent
+    slot: BODY
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Blank with Attributes
+    template-options: 
+    - '#DEFAULT#'
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    edit: 
+      enabled: true
+      allowed-operations: 
+      - Add Row
+      - Update Row
+      - Delete Row
+      lost-update-type: Row Values
+
+- # ====== Region: Buttons =====================================
+  id: 154787840252355757482
+  identification: 
+    name: Buttons
+    type: Static Content
+
+  layout: 
+    sequence: 20
+    parent-region: No Parent
+    slot: REGION_POSITION_03
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Buttons Container
+    template-options: 
+    - '#DEFAULT#'
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    settings: 
+      output-as: Text (escape special characters)
+      show-line-breaks: true
+
+page-items: 
+- # ====== Page Item: P4_PAYER =================================
+  id: 154784938828313212005
+  identification: 
+    name: P4_PAYER
+    type: Select List
+
+  label: 
+    label: Payer
+    alignment: Left
+
+  settings: 
+    page-action-on-selection: None
+
+  multiple-values: 
+    type: No
+
+  layout: 
+    sequence: 60
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+    alignment: Left
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+    label-column-span: Page Template Default
+
+  appearance: 
+    template: Optional - Floating
+    template-options: 
+    - '#DEFAULT#'
+    height: 1
+
+  validation: 
+    value-required: true
+
+  list-of-values: 
+    type: SQL Query
+    sql-query: |
+      select 
+          user_name as d,
+          user_id as r
+              from user_detail 
+              where user_id in (
+                  select user_id 
+                  from user_group
+                      where group_id = :p4_group_id
+              );
+    display-extra-values: true
+    display-null-value: true
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Function Body
+    language: PL/SQL
+    pl/sql-function-body: |
+      if :P4_EXPENSE_ID is not null
+      Then
+          Begin
+              select
+                  lender_user_id
+              into
+                  :P4_PAYER
+              from
+                  amount_detail
+              where 
+                  expense_id = :P4_EXPENSE_ID
+               and group_id = :P4_GROUP_ID
+               and rownum = 1;
+              return :P4_PAYER;
+          Exception
+              when no_data_found then
+                  return null;
+           end;
+      end if;
+      return null;
+    used: Always, replacing any existing value in session state
+
+  session-state: 
+    storage: Per Request (Memory Only)
+
+  quick-picks: 
+    show-quick-picks: false
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P4_INCLUDED_MEMBERS ======================
+  id: 154784938988579212006
+  identification: 
+    name: P4_INCLUDED_MEMBERS
+    type: Popup LOV
+
+  label: 
+    label: Included Members
+    alignment: Left
+
+  settings: 
+    display-as: Inline Popup
+    initial-fetch: Automatic with Current Value
+    manual-entry: false
+    fetch-on-search: false
+
+  search: 
+    match-type: Starts With
+    case-sensitive: false
+    minimum-characters: 0
+
+  multiple-values: 
+    type: Delimited List
+    separator: ':'
+
+  layout: 
+    sequence: 70
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+    alignment: Left
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+    label-column-span: Page Template Default
+
+  appearance: 
+    template: Optional - Floating
+    template-options: 
+    - '#DEFAULT#'
+    width: 30
+
+  validation: 
+    value-required: false
+
+  list-of-values: 
+    type: SQL Query
+    sql-query: |
+      select user_name as d,
+          user_id as r
+              from user_detail
+                  where user_id in (
+                      select user_id from user_group where group_id = :P4_group_id
+                  );
+    display-extra-values: true
+    display-null-value: true
+
+  cascading-list-of-values: 
+    parent-item(s): 
+    - P4_GROUP_ID
+    items-to-submit: 
+    - P4_GROUP_ID
+    parent-required: true
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Function Body
+    language: PL/SQL
+    pl/sql-function-body: |
+      if :P4_EXPENSE_ID is not null
+      then
+          select 
+              LISTAGG(borrower_user_id,':')
+             into :P4_INCLUDED_MEMBERS
+             from amount_detail
+             where group_id = :P4_GROUP_ID
+             and expense_id = :P4_EXPENSE_ID
+             and rownum = 1;
+          return :P4_INCLUDED_MEMBERS;
+      end if;
+      return null;
+    used: Always, replacing any existing value in session state
+
+  session-state: 
+    storage: Per Session (Persistent)
+
+  quick-picks: 
+    show-quick-picks: false
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P4_EXPENSE_ID ============================
+  id: 154787835015492757471
+  identification: 
+    name: P4_EXPENSE_ID
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 10
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    form-region: Add Expense # 154787834744827757470
+    column: EXPENSE_ID
+    data-type: NUMBER
+    query-only: false
+    primary-key: true
+
+  default: 
+    type: SQL Query (return single value)
+    sql-query-(return-single-value): select seq_expense_id.NEXTVAL from dual;
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Request (Memory Only)
+
+  security: 
+    session-state-protection: Checksum Required - Session Level
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P4_GROUP_ID ==============================
+  id: 154787835427317757473
+  identification: 
+    name: P4_GROUP_ID
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 20
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    form-region: Add Expense # 154787834744827757470
+    column: GROUP_ID
+    data-type: NUMBER
+    query-only: false
+    primary-key: false
+
+  default: 
+    type: Item
+    item: P3_GROUP_ID
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Request (Memory Only)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P4_EXPENSE_NAME ==========================
+  id: 154787836187401757475
+  identification: 
+    name: P4_EXPENSE_NAME
+    type: Text Field
+
+  label: 
+    label: Expense Name
+    alignment: Left
+
+  settings: 
+    subtype: Text
+    trim-spaces: Leading and Trailing
+    text-case: NO CHANGE
+    submit-when-enter-pressed: false
+    disabled: false
+
+  layout: 
+    sequence: 30
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+    alignment: Left
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+    label-column-span: Page Template Default
+
+  appearance: 
+    template: Required - Floating
+    template-options: 
+    - '#DEFAULT#'
+    width: 60
+
+  validation: 
+    value-required: true
+    maximum-length: 256
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    form-region: Add Expense # 154787834744827757470
+    column: EXPENSE_NAME
+    data-type: VARCHAR2
+    query-only: false
+    primary-key: false
+
+  session-state: 
+    storage: Per Request (Memory Only)
+
+  quick-picks: 
+    show-quick-picks: false
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P4_EXPENSE_TYPE ==========================
+  id: 154787836529910757476
+  identification: 
+    name: P4_EXPENSE_TYPE
+    type: Select List
+
+  label: 
+    label: Expense Type
+    alignment: Left
+
+  settings: 
+    page-action-on-selection: None
+
+  multiple-values: 
+    type: No
+
+  layout: 
+    sequence: 40
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+    alignment: Left
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+    label-column-span: Page Template Default
+
+  appearance: 
+    template: Required - Floating
+    template-options: 
+    - '#DEFAULT#'
+    height: 1
+
+  validation: 
+    value-required: true
+
+  list-of-values: 
+    type: Static Values
+    static-values: 'STATIC:Food and Drink;https://icons.iconarchive.com/icons/aha-soft/desktop-buffet/16/Steak-icon.png,Home and Utilities;https://icons.iconarchive.com/icons/apathae/chakram-2/16/Home-icon.png,Transportation;https://icons.iconarchive.com/icons/iconshow/transport/16/Sportscar-car-icon.png,Entertainment;https://icons.iconarchive.com/icons/wwalczyszyn/android-style-honeycomb/16/Music-icon.png,Other;https://icons.iconarchive.com/icons/awicons/vista-artistic/16/coin-add-icon.png'
+    display-extra-values: true
+    display-null-value: true
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    form-region: Add Expense # 154787834744827757470
+    column: EXPENSE_TYPE
+    data-type: VARCHAR2
+    query-only: false
+    primary-key: false
+
+  session-state: 
+    storage: Per Request (Memory Only)
+
+  quick-picks: 
+    show-quick-picks: false
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P4_EXPENSE_AMOUNT ========================
+  id: 154787836913272757476
+  identification: 
+    name: P4_EXPENSE_AMOUNT
+    type: Number Field
+
+  label: 
+    label: Expense Amount
+    alignment: Left
+
+  settings: 
+    number-alignment: Start
+    virtual-keyboard: Numeric
+
+  layout: 
+    sequence: 50
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+    alignment: Left
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+    label-column-span: Page Template Default
+
+  appearance: 
+    template: Required - Floating
+    template-options: 
+    - '#DEFAULT#'
+    width: 32
+
+  validation: 
+    value-required: true
+    maximum-length: 255
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    form-region: Add Expense # 154787834744827757470
+    column: EXPENSE_AMOUNT
+    data-type: NUMBER
+    query-only: false
+    primary-key: false
+
+  session-state: 
+    storage: Per Request (Memory Only)
+
+  quick-picks: 
+    show-quick-picks: false
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P4_TRANSCATION_DATE ======================
+  id: 154787837371551757477
+  identification: 
+    name: P4_TRANSCATION_DATE
+    type: Date Picker
+
+  label: 
+    label: Transcation Date
+    alignment: Left
+
+  settings: 
+    show-time: false
+    display-as: Popup
+    minimum-date: None
+    maximum-date: None
+    multiple-months: No
+    use-defaults: true
+
+  layout: 
+    sequence: 80
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+    alignment: Left
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+    label-column-span: Page Template Default
+
+  appearance: 
+    template: Optional - Floating
+    template-options: 
+    - '#DEFAULT#'
+    width: 32
+
+  validation: 
+    value-required: true
+    maximum-length: 255
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    form-region: Add Expense # 154787834744827757470
+    column: TRANSCATION_DATE
+    data-type: DATE
+    query-only: false
+    primary-key: false
+
+  session-state: 
+    storage: Per Request (Memory Only)
+
+  quick-picks: 
+    show-quick-picks: false
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P4_NOTE ==================================
+  id: 154787837749145757477
+  identification: 
+    name: P4_NOTE
+    type: Textarea
+
+  label: 
+    label: Note
+    alignment: Left
+
+  settings: 
+    resizable: true
+    auto-height: false
+    character-counter: false
+    trim-spaces: Leading and Trailing
+
+  layout: 
+    sequence: 90
+    region: Add Expense # 154787834744827757470
+    slot: BODY
+    alignment: Left
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+    label-column-span: Page Template Default
+
+  appearance: 
+    template: Optional - Floating
+    template-options: 
+    - '#DEFAULT#'
+    width: 60
+    height: 4
+
+  validation: 
+    value-required: false
+    maximum-length: 4000
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    form-region: Add Expense # 154787834744827757470
+    column: NOTE
+    data-type: VARCHAR2
+    query-only: false
+    primary-key: false
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Request (Memory Only)
+
+  quick-picks: 
+    show-quick-picks: false
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+buttons: 
+- # ====== Button: UPDATE ======================================
+  id: 154784942219210212039
+  identification: 
+    button-name: UPDATE
+    label: UPDATE
+
+  layout: 
+    sequence: 40
+    region: Buttons # 154787840252355757482
+    slot: NEXT
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text with Icon
+    hot: true
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--iconLeft
+    icon: fa-edit
+
+  behavior: 
+    action: Submit Page
+    execute-validations: true
+    show-processing: false
+    warn-on-unsaved-changes: Do Not Check
+    database-action: SQL INSERT action
+
+  server-side-condition: 
+    type: Item is NULL
+    item: P4_EXPENSE_ID
+
+- # ====== Button: CANCEL ======================================
+  id: 154787840623239757482
+  identification: 
+    button-name: CANCEL
+    label: Cancel
+
+  layout: 
+    sequence: 10
+    region: Buttons # 154787840252355757482
+    slot: CLOSE
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text
+    hot: false
+    template-options: 
+    - '#DEFAULT#'
+
+  behavior: 
+    action: Defined by Dynamic Action
+    execute-validations: true
+
+- # ====== Button: SAVE ========================================
+  id: 154787842431705757484
+  identification: 
+    button-name: SAVE
+    label: SAVE
+
+  layout: 
+    sequence: 30
+    region: Buttons # 154787840252355757482
+    slot: NEXT
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text with Icon
+    hot: true
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--iconLeft
+    icon: fa-save
+
+  behavior: 
+    action: Submit Page
+    execute-validations: true
+    show-processing: false
+    warn-on-unsaved-changes: Do Not Check
+    database-action: SQL INSERT action
+
+  server-side-condition: 
+    type: Item is NOT NULL
+    item: P4_EXPENSE_ID
+
+dynamic-actions: 
+- # ====== Dynamic Action: Cancel Dialog =======================
+  id: 154787840700491757482
+  identification: 
+    name: Cancel Dialog
+
+  execution: 
+    sequence: 10
+    event-scope: Static
+    type: Immediate
+
+  when: 
+    event: Click
+    selection-type: Button
+    button: CANCEL # 154787840623239757482
+
+  actions: 
+  - # ====== Action: Cancel Dialog ===============================
+    id: 154787841545535757483
+    identification: 
+      action: Cancel Dialog
+
+    execution: 
+      sequence: 10
+      event: Cancel Dialog # 154787840700491757482
+      fire-when-event-result-is: True
+      fire-on-initialization: false
+
+processes: 
+- # ====== Process: insert in amount_detail table ==============
+  id: 154784939087947212007
+  identification: 
+    name: insert in amount_detail table
+    type: Execute Code
+    execution-chain: None
+
+  source: 
+    location: Local Database
+    language: PL/SQL
+    pl/sql-code: |
+      declare 
+          v_selected apex_t_varchar2;
+          v_count number;
+      Begin
+         v_selected := apex_string.split(:P4_INCLUDED_MEMBERS,':');
+         v_count := v_selected.count;
+         for i in 1..v_selected.count loop
+          insert into amount_detail(
+                  group_id,
+                  expense_id,
+                  borrower_user_id,
+                  borrow_amount,
+                  lender_user_id,
+                  lending_amount
+          ) VALUES(
+              :P4_GROUP_ID,
+              :P4_EXPENSE_ID,
+              v_selected(i),
+              :P4_EXPENSE_AMOUNT/v_count,
+              :P4_PAYER,
+              :P4_EXPENSE_AMOUNT/v_count
+          );
+          END LOOP;
+      END;
+
+  execution: 
+    sequence: 20
+    point: Processing
+    run-process: Once Per Page Visit (default)
+
+  success-message: 
+    success-message: inserted
+
+  error: 
+    error-message: error
+    display-location: Inline in Notification
+
+  server-side-condition: 
+    when-button-pressed: SAVE # 154787842431705757484
+
+- # ====== Process: update the expense =========================
+  id: 154784942321529212040
+  identification: 
+    name: update the expense
+    type: Execute Code
+    execution-chain: None
+
+  source: 
+    location: Local Database
+    language: PL/SQL
+    pl/sql-code: |
+      declare
+          v_select_member apex_t_varchar2;
+          v_count number;
+      Begin
+          update expense 
+              set
+                  expense_name = :P4_EXPENSE_NAME,
+                  expense_type = :P4_EXPENSE_TYPE,
+                  expense_amount = :P4_EXPENSE_AMOUNT,
+                  transcation_date = :P4_TRANSCATION_DATE,
+                  note = :P4_NOTE
+              where
+                  expense_id = :P4_EXPENSE_ID;
+          
+          v_select_member := apex_string.split(:P4_INCLUDED_MEMBERS,':');
+              delete from amount_detail
+                  where expense_id = :P4_EXPENSE_ID;
+      
+           v_count := v_select_member.count;
+          for i in 1..v_select_member.count loop
+              insert into amount_detail(
+                  group_id,
+                  expense_id,
+                  borrower_user_id,
+                  borrow_amount,
+                  lender_user_id,
+                  lending_amount
+               ) VALUES(
+              :P4_GROUP_ID,
+              :P4_EXPENSE_ID,
+              v_select_member(i),
+              :P4_EXPENSE_AMOUNT/v_count,
+              :P4_PAYER,
+              :P4_EXPENSE_AMOUNT/v_count
+              );
+          end loop;
+      end;
+      
+          
+      
+
+  execution: 
+    sequence: 30
+    point: Processing
+    run-process: Once Per Page Visit (default)
+
+  error: 
+    display-location: Inline in Notification
+
+  server-side-condition: 
+    when-button-pressed: UPDATE # 154784942219210212039
+
+- # ====== Process: Initialize form Add Expense ================
+  id: 154787843285323757485
+  identification: 
+    name: Initialize form Add Expense
+    type: Form - Initialization
+    execution-chain: None
+    form-region: Add Expense # 154787834744827757470
+
+  execution: 
+    sequence: 10
+    point: Before Header
+    run-process: Once Per Page Visit (default)
+
+- # ====== Process: Process form Add Expense ===================
+  id: 154787843669178757486
+  identification: 
+    name: Process form Add Expense
+    type: Form - Automatic Row Processing (DML)
+    execution-chain: None
+    form-region: Add Expense # 154787834744827757470
+
+  settings: 
+    target-type: Region Source
+    prevent-lost-updates: true
+    lock-row: Yes
+    return-primary-key(s)-after-insert: true
+
+  execution: 
+    sequence: 10
+    point: Processing
+    run-process: Once Per Page Visit (default)
+
+  error: 
+    display-location: Inline in Notification
+
+  server-side-condition: 
+    when-button-pressed: SAVE # 154787842431705757484
+
+- # ====== Process: Close Dialog ===============================
+  id: 154787844032851757486
+  identification: 
+    name: Close Dialog
+    type: Close Dialog
+    execution-chain: None
+
+  settings: 
+    show-success-messages: true
+
+  execution: 
+    sequence: 40
+    point: Processing
+    run-process: Once Per Page Visit (default)
+
+  error: 
+    display-location: Inline in Notification
+
+  server-side-condition: 
+    type: Request is contained in Value
+    value: CREATE,SAVE,DELETE
+
+branches: 
+- # ====== Branch: expense age after update ====================
+  id: 154784942852516212045
+  identification: 
+    name: expense age after update
+
+  execution: 
+    sequence: 10
+    point: After Processing
+
+  behavior: 
+    type: Page or URL (Redirect)
+    target: 
+      url: 'f?p=&APP_ID.:7:&SESSION.::&DEBUG.:::&success_msg=#SUCCESS_MSG#'
+      page: 7 # Expense Detail
+
+  server-side-condition: 
+    type: Request = Value
+    value: UPDATE
+

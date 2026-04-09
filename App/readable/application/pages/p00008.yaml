@@ -1,0 +1,292 @@
+---
+# ====== Page: Member ========================================
+id: 8
+identification: 
+  name: Member
+  alias: MEMBER
+  title: Member
+
+appearance: 
+  page-mode: Modal Dialog
+  dialog-template: Theme Default
+  template-options: 
+  - '#DEFAULT#'
+
+dialog: 
+  chained: true
+  resizable: true
+
+navigation-menu: 
+  override-user-interface-level: false
+
+navigation: 
+  cursor-focus: Do not focus cursor
+  warn-on-unsaved-changes: true
+
+security: 
+  authentication: Page Requires Authentication
+  deep-linking: Application Default
+  page-access-protection: Arguments Must Have Checksum
+  form-auto-complete: Off
+  browser-cache: Application Default
+
+session-management: 
+  rejoin-sessions: Application Default
+
+advanced: 
+  enable-duplicate-page-submissions: Yes - Enable page to be re-posted
+  reload-on-submit: Only for Success
+
+server-cache: 
+  caching: Disabled
+
+regions: 
+- # ====== Region: member ======================================
+  id: 154784940222506212019
+  identification: 
+    name: member
+    title: '&P8_GROUP_NAME.'
+    type: Media List
+
+  source: 
+    location: Local Database
+    type: SQL Query
+    sql-query: |
+      select 
+          user_name,
+          email
+          from user_detail ud join user_group ug on ud.user_id = ug.user_id
+          where ug.group_id = :P8_group_id;
+
+  order-by: 
+    type: None
+
+  layout: 
+    sequence: 10
+    parent-region: No Parent
+    slot: BODY
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Standard
+    template-options: 
+    - '#DEFAULT#'
+    - t-Region--scrollBody
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    appearance: 
+      display: Multiple (Report)
+
+    settings: 
+      title: USER_NAME
+      description: EMAIL
+      display-avatar: true
+      display-badge: false
+      layout: Default
+      size: Default
+      apply-theme-colors: true
+
+    avatar: 
+      type: Icon
+      icon: fa-user-man
+      shape: Rounded
+
+    row-selection: 
+      type: None
+
+    performance: 
+      lazy-loading: false
+
+    pagination: 
+      type: Page
+      entities-per-page: 15
+      show-total-count: false
+
+  columns: 
+  - # ====== Column: EMAIL =======================================
+    id: 154784940357518212020
+    identification: 
+      name: EMAIL
+
+    layout: 
+      sequence: 10
+
+    source: 
+      type: Database Column
+      database-column: EMAIL
+      data-type: VARCHAR2
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: USER_NAME ===================================
+    id: 154784940625846212023
+    identification: 
+      name: USER_NAME
+
+    layout: 
+      sequence: 20
+
+    source: 
+      type: Database Column
+      database-column: USER_NAME
+      data-type: VARCHAR2
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+page-items: 
+- # ====== Page Item: P8_GROUP_ID ==============================
+  id: 154784940420227212021
+  identification: 
+    name: P8_GROUP_ID
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 10
+    region: member # 154784940222506212019
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Null
+    used: Only when current value in session state is null
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Session (Persistent)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P8_GROUP_NAME ============================
+  id: 154784940528433212022
+  identification: 
+    name: P8_GROUP_NAME
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 20
+    region: member # 154784940222506212019
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Null
+    used: Only when current value in session state is null
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Session (Persistent)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+buttons: 
+- # ====== Button: Add_member ==================================
+  id: 154784940736667212024
+  identification: 
+    button-name: Add_member
+    label: Add Member
+
+  layout: 
+    sequence: 10
+    region: member # 154784940222506212019
+    slot: COPY
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text with Icon
+    hot: true
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--iconLeft
+    icon: fa-address-book-o
+
+  behavior: 
+    action: Redirect to Page in this Application
+    target: 
+      url: 'f?p=&APP_ID.:10:&SESSION.::&DEBUG.::P10_GROUP_ID:&P8_GROUP_ID.'
+      page: 10 # ADD MEMBER
+      values: 
+        p10_group_id: '&P8_GROUP_ID.'
+
+    warn-on-unsaved-changes: Do Not Check
+
+dynamic-actions: 
+- # ====== Dynamic Action: Dialog Closed =======================
+  id: 154784941866355212035
+  identification: 
+    name: Dialog Closed
+
+  execution: 
+    sequence: 10
+    event-scope: Static
+    type: Immediate
+
+  when: 
+    event: Dialog Closed
+    selection-type: jQuery Selector
+    jquery-selector: Body
+
+  actions: 
+  - # ====== Action: Refresh =====================================
+    id: 154784941987285212036
+    identification: 
+      action: Refresh
+
+    settings: 
+      maintain-pagination: false
+
+    affected-elements: 
+      selection-type: Region
+      region: member # 154784940222506212019
+
+    execution: 
+      sequence: 10
+      event: Dialog Closed # 154784941866355212035
+      fire-when-event-result-is: True
+      fire-on-initialization: false
+

@@ -1,0 +1,166 @@
+---
+# ====== Page: chart =========================================
+id: 11
+identification: 
+  name: chart
+  alias: APP-USER
+  title: Chart
+
+appearance: 
+  page-mode: Modal Dialog
+  dialog-template: Theme Default
+  template-options: 
+  - '#DEFAULT#'
+  - t-Dialog--noPadding
+  - t-PageBody--noContentPadding
+
+dialog: 
+  chained: true
+  resizable: true
+
+navigation-menu: 
+  override-user-interface-level: false
+
+navigation: 
+  cursor-focus: Do not focus cursor
+  warn-on-unsaved-changes: true
+
+security: 
+  authentication: Page Requires Authentication
+  deep-linking: Application Default
+  page-access-protection: Arguments Must Have Checksum
+  form-auto-complete: Off
+  browser-cache: Application Default
+
+session-management: 
+  rejoin-sessions: Application Default
+
+advanced: 
+  enable-duplicate-page-submissions: Yes - Enable page to be re-posted
+  reload-on-submit: Only for Success
+
+server-cache: 
+  caching: Disabled
+
+regions: 
+- # ====== Region: &APP_USER. ==================================
+  id: 156160092120759163701
+  identification: 
+    name: '&APP_USER.'
+    type: Chart
+
+  source: 
+    location: None
+
+  layout: 
+    sequence: 10
+    parent-region: No Parent
+    slot: BODY
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Standard
+    template-options: 
+    - '#DEFAULT#'
+    - t-Region--scrollBody
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  security: 
+    escape-special-characters: false
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    id: 156160092506516163702
+    chart: 
+      type: Pie
+
+    layout: 
+      height: 400
+
+    data-cursor: 
+      cursor: Automatic
+      behavior: Automatic
+      dim-on-hover: true
+
+    settings: 
+      pie-selection-effect: Highlight
+
+    value: 
+      pie-chart-other-threshold: 0
+      format: Decimal
+      decimal-places: 0
+      format-scaling: None
+
+    animation: 
+      on-display: Automatic
+      on-data-change: Automatic
+
+    tooltip: 
+      show: true
+      show-series-name: true
+      show-value: true
+
+    legend: 
+      show: true
+      position: Automatic
+      hide-and-show-behavior: Rescale
+
+    series: 
+    - # ====== Series: Series 1 ====================================
+      id: 156160093017457163703
+      identification: 
+        name: Series 1
+
+      execution: 
+        sequence: 10
+
+      source: 
+        location: Local Database
+        type: SQL Query
+        sql-query: |
+          select get_user_name(a.borrower_user_id) user_name,
+                  sum(a.borrow_amount) amount,
+                  case
+                      when e.expense_type = 'https://icons.iconarchive.com/icons/aha-soft/desktop-buffet/16/Steak-icon.png' THEN 'Food and Drink'
+                      when e.expense_type = 'https://icons.iconarchive.com/icons/apathae/chakram-2/16/Home-icon.png' then 'Home and Utilities'
+                      when e.expense_type = 'https://icons.iconarchive.com/icons/iconshow/transport/16/Sportscar-car-icon.png' THEN 'Transportation'
+                      when e.expense_type = 'https://icons.iconarchive.com/icons/wwalczyszyn/android-style-honeycomb/16/Music-icon.png' THEN 'Entertainment'
+                      when e.expense_type = 'https://icons.iconarchive.com/icons/awicons/vista-artistic/16/coin-add-icon.png' THEN 'Other'
+                  end as expense_type
+              from
+                  amount_detail a,
+                  expense e
+              where
+                  e.expense_id = a.expense_id
+              and
+                  a.borrower_user_id = (select user_id from user_detail where user_name = :app_user)
+              group by
+                  e.expense_type,
+                  a.borrower_user_id;
+
+      order-by: 
+        type: None
+
+      column-mapping: 
+        label: EXPENSE_TYPE
+        value: AMOUNT
+
+      label: 
+        show: true
+        position: Automatic
+        display-as: Label
+

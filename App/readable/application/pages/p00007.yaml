@@ -1,0 +1,424 @@
+---
+# ====== Page: Expense Detail ================================
+id: 7
+identification: 
+  name: Expense Detail
+  alias: EXPENSE-DETAIL
+  title: Expense Detail
+
+appearance: 
+  page-mode: Modal Dialog
+  dialog-template: Theme Default
+  template-options: 
+  - '#DEFAULT#'
+
+dialog: 
+  chained: true
+  resizable: true
+
+navigation-menu: 
+  override-user-interface-level: false
+
+navigation: 
+  cursor-focus: Do not focus cursor
+  warn-on-unsaved-changes: true
+
+security: 
+  authentication: Page Requires Authentication
+  deep-linking: Application Default
+  page-access-protection: Arguments Must Have Checksum
+  form-auto-complete: Off
+  browser-cache: Application Default
+
+session-management: 
+  rejoin-sessions: Application Default
+
+advanced: 
+  enable-duplicate-page-submissions: Yes - Enable page to be re-posted
+  reload-on-submit: Only for Success
+
+server-cache: 
+  caching: Disabled
+
+regions: 
+- # ====== Region: Expense Detail ==============================
+  id: 154784939424760212011
+  identification: 
+    name: Expense Detail
+    title: '&P5_EXPENSE_NAME.'
+    type: Static Content
+
+  layout: 
+    sequence: 10
+    parent-region: No Parent
+    slot: REGION_POSITION_01
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Standard
+    template-options: 
+    - '#DEFAULT#'
+    - t-Region--scrollBody
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    settings: 
+      output-as: HTML
+      expand-shortcuts: false
+
+- # ====== Region: Payer Detail ================================
+  id: 154784939590362212012
+  identification: 
+    name: Payer Detail
+    title: Payer Detail
+    type: Dynamic Content
+
+  source: 
+    language: PL/SQL
+    pl/sql-function-body-returning-a-clob: |
+      Declare
+          v_clob clob;
+      Begin
+          v_clob := get_lender_detail(:P7_GROUP_ID,:P7_EXPENSE_ID);
+      
+          Return v_clob;
+      End;
+
+  layout: 
+    sequence: 20
+    parent-region: Expense Detail # 154784939424760212011
+    slot: SUB_REGIONS
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Standard
+    template-options: 
+    - '#DEFAULT#'
+    - t-Region--scrollBody
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  server-cache: 
+    caching: Disabled
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    performance: 
+      lazy-loading: false
+
+- # ====== Region: Split Details ===============================
+  id: 154784939672772212013
+  identification: 
+    name: Split Details
+    title: Split Details
+    type: Dynamic Content
+
+  source: 
+    language: PL/SQL
+    pl/sql-function-body-returning-a-clob: |
+      DECLARE
+          l_clob CLOB;
+      BEGIN
+          l_clob := get_borrower_details(:P7_GROUP_ID,:P7_EXPENSE_ID);
+      
+          RETURN l_clob;
+      END;
+      
+      
+
+  layout: 
+    sequence: 21
+    parent-region: Expense Detail # 154784939424760212011
+    slot: SUB_REGIONS
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Collapsible
+    template-options: 
+    - '#DEFAULT#'
+    - t-Region--noPadding
+    - is-expanded
+    - t-Region--scrollBody
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  server-cache: 
+    caching: Disabled
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    performance: 
+      lazy-loading: false
+
+page-items: 
+- # ====== Page Item: P7_GROUP_ID ==============================
+  id: 154784939746113212014
+  identification: 
+    name: P7_GROUP_ID
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 10
+    region: Expense Detail # 154784939424760212011
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Null
+    used: Only when current value in session state is null
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Session (Persistent)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P7_EXPENSE_ID ============================
+  id: 154784939849017212015
+  identification: 
+    name: P7_EXPENSE_ID
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 20
+    region: Expense Detail # 154784939424760212011
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Null
+    used: Only when current value in session state is null
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Session (Persistent)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P7_EXPENSE_NAME ==========================
+  id: 154784939974278212016
+  identification: 
+    name: P7_EXPENSE_NAME
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 30
+    region: Expense Detail # 154784939424760212011
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Null
+    used: Only when current value in session state is null
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Session (Persistent)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+buttons: 
+- # ====== Button: Update_Expense ==============================
+  id: 154784942035401212037
+  identification: 
+    button-name: Update_Expense
+    label: Update Expense
+
+  layout: 
+    sequence: 40
+    region: Expense Detail # 154784939424760212011
+    slot: CHANGE
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text with Icon
+    hot: true
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--iconLeft
+    icon: fa-edit
+
+  behavior: 
+    action: Redirect to Page in this Application
+    target: 
+      url: 'f?p=&APP_ID.:4:&SESSION.::&DEBUG.::P4_EXPENSE_ID,P4_GROUP_ID:&P7_EXPENSE_ID.,&P7_GROUP_ID.'
+      page: 4 # Add Expense
+      values: 
+        p4_expense_id: '&P7_EXPENSE_ID.'
+        p4_group_id: '&P7_GROUP_ID.'
+
+    warn-on-unsaved-changes: Do Not Check
+
+- # ====== Button: Delete ======================================
+  id: 154784942138870212038
+  identification: 
+    button-name: Delete
+    label: Delete
+
+  layout: 
+    sequence: 50
+    region: Expense Detail # 154784939424760212011
+    slot: DELETE
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text
+    hot: false
+    template-options: 
+    - '#DEFAULT#'
+
+  behavior: 
+    action: Redirect to URL
+    target: "javascript: apex.confirm('Do you want to delete the expense?','DELETE');"
+    execute-validations: true
+    warn-on-unsaved-changes: Do Not Check
+
+dynamic-actions: 
+- # ====== Dynamic Action: dialog_closed =======================
+  id: 154784942450420212041
+  identification: 
+    name: dialog_closed
+
+  execution: 
+    sequence: 10
+    event-scope: Static
+    type: Immediate
+
+  when: 
+    event: Dialog Closed
+    selection-type: jQuery Selector
+    jquery-selector: Body
+
+  actions: 
+  - # ====== Action: Execute JavaScript Code =====================
+    id: 154784942512614212042
+    identification: 
+      action: Execute JavaScript Code
+
+    settings: 
+      code: window.location.reload();
+
+    execution: 
+      sequence: 10
+      event: dialog_closed # 154784942450420212041
+      fire-when-event-result-is: True
+      fire-on-initialization: false
+
+processes: 
+- # ====== Process: delete expense =============================
+  id: 154784942690741212043
+  identification: 
+    name: delete expense
+    type: Execute Code
+    execution-chain: None
+
+  source: 
+    location: Local Database
+    language: PL/SQL
+    pl/sql-code: 'delete from expense where expense_id = :P7_EXPENSE_ID;'
+
+  execution: 
+    sequence: 10
+    point: Processing
+    run-process: Once Per Page Visit (default)
+
+  error: 
+    display-location: Inline in Notification
+
+  server-side-condition: 
+    type: Request = Value
+    value: DELETE
+
+branches: 
+- # ====== Branch: Go To Page 3 ================================
+  id: 154784942737742212044
+  identification: 
+    name: Go To Page 3
+
+  execution: 
+    sequence: 10
+    point: After Processing
+
+  behavior: 
+    type: Page or URL (Redirect)
+    target: 
+      url: 'f?p=&APP_ID.:3:&SESSION.::&DEBUG.:::&success_msg=#SUCCESS_MSG#'
+      page: 3 # Expense
+
+  server-side-condition: 
+    type: Request = Value
+    value: DELETE
+

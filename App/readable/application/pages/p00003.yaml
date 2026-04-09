@@ -1,0 +1,512 @@
+---
+# ====== Page: Expense =======================================
+id: 3
+identification: 
+  name: Expense
+  alias: EXPENSE
+  title: Expense
+
+appearance: 
+  page-mode: Normal
+  page-template: Theme Default
+  template-options: 
+  - '#DEFAULT#'
+
+navigation-menu: 
+  override-user-interface-level: false
+
+navigation: 
+  cursor-focus: Do not focus cursor
+  warn-on-unsaved-changes: true
+
+security: 
+  authentication: Page Requires Authentication
+  deep-linking: Application Default
+  page-access-protection: Arguments Must Have Checksum
+  form-auto-complete: Off
+  browser-cache: Application Default
+
+session-management: 
+  rejoin-sessions: Application Default
+
+advanced: 
+  enable-duplicate-page-submissions: Yes - Enable page to be re-posted
+  reload-on-submit: Only for Success
+
+server-cache: 
+  caching: Disabled
+
+regions: 
+- # ====== Region: Expenses ====================================
+  id: 146643408773290658639
+  identification: 
+    name: Expenses
+    title: '&P3_GROUP_NAME.'
+    type: Media List
+
+  source: 
+    location: Local Database
+    type: SQL Query
+    sql-query: |
+      select 
+          expense_id,
+          expense_name,
+          expense_type,
+          expense_amount,
+          transcation_date,
+          Group_id,
+          note
+              from expense where expense_id in (
+                  select expense_id from expense where group_id = :P3_GROUP_ID
+              );
+      
+
+  order-by: 
+    type: None
+
+  layout: 
+    sequence: 10
+    parent-region: No Parent
+    slot: BODY
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Standard
+    template-options: 
+    - '#DEFAULT#'
+    - t-Region--scrollBody
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    appearance: 
+      display: Multiple (Report)
+
+    settings: 
+      title: EXPENSE_NAME
+      description: TRANSCATION_DATE
+      display-avatar: true
+      display-badge: true
+      layout: Default
+      size: Default
+      apply-theme-colors: true
+
+    avatar: 
+      type: Image
+      image: 
+        url-column: EXPENSE_TYPE
+
+      shape: Rounded
+
+    badge: 
+      label: Amount
+      value: EXPENSE_AMOUNT
+      display-label: false
+      style: Default
+      shape: Default
+
+    row-selection: 
+      type: None
+
+    performance: 
+      lazy-loading: false
+
+    pagination: 
+      type: Page
+      entities-per-page: 15
+      show-total-count: false
+
+  columns: 
+  - # ====== Column: EXPENSE_ID ==================================
+    id: 146643409264026658644
+    identification: 
+      name: EXPENSE_ID
+
+    layout: 
+      sequence: 10
+
+    source: 
+      type: Database Column
+      database-column: EXPENSE_ID
+      data-type: NUMBER
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: EXPENSE_NAME ================================
+    id: 146643409312370658645
+    identification: 
+      name: EXPENSE_NAME
+
+    layout: 
+      sequence: 20
+
+    source: 
+      type: Database Column
+      database-column: EXPENSE_NAME
+      data-type: VARCHAR2
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: EXPENSE_TYPE ================================
+    id: 146643409403116658646
+    identification: 
+      name: EXPENSE_TYPE
+
+    layout: 
+      sequence: 30
+
+    source: 
+      type: Database Column
+      database-column: EXPENSE_TYPE
+      data-type: VARCHAR2
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: EXPENSE_AMOUNT ==============================
+    id: 146643409533708658647
+    identification: 
+      name: EXPENSE_AMOUNT
+
+    layout: 
+      sequence: 40
+
+    source: 
+      type: Database Column
+      database-column: EXPENSE_AMOUNT
+      data-type: NUMBER
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: TRANSCATION_DATE ============================
+    id: 146643409699787658648
+    identification: 
+      name: TRANSCATION_DATE
+
+    layout: 
+      sequence: 50
+
+    source: 
+      type: Database Column
+      database-column: TRANSCATION_DATE
+      data-type: DATE
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: GROUP_ID ====================================
+    id: 146643409736661658649
+    identification: 
+      name: GROUP_ID
+
+    layout: 
+      sequence: 60
+
+    source: 
+      type: Database Column
+      database-column: GROUP_ID
+      data-type: NUMBER
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: NOTE ========================================
+    id: 154784939329011212010
+    identification: 
+      name: NOTE
+
+    layout: 
+      sequence: 70
+
+    source: 
+      type: Database Column
+      database-column: NOTE
+      data-type: VARCHAR2
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  actions: 
+  - # ====== Action: Link ========================================
+    id: 154784940003778212017
+    identification: 
+      position: Link # 354086328093939142
+
+    layout: 
+      sequence: 10
+
+    link: 
+      type: Redirect to Page in this Application
+      target: 
+        url: 'f?p=&APP_ID.:7:&SESSION.::&DEBUG.::P7_EXPENSE_ID,P7_EXPENSE_NAME,P7_GROUP_ID:&EXPENSE_ID.,&EXPENSE_NAME.,&GROUP_ID.'
+        page: 7 # Expense Detail
+        values: 
+          p7_expense_id: '&EXPENSE_ID.'
+          p7_expense_name: '&EXPENSE_NAME.'
+          p7_group_id: '&GROUP_ID.'
+
+page-items: 
+- # ====== Page Item: P3_GROUP_ID ==============================
+  id: 154784938452475212001
+  identification: 
+    name: P3_GROUP_ID
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 10
+    region: Expenses # 146643408773290658639
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Null
+    used: Only when current value in session state is null
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Session (Persistent)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+- # ====== Page Item: P3_GROUP_NAME ============================
+  id: 154784938580850212002
+  identification: 
+    name: P3_GROUP_NAME
+    type: Hidden
+
+  settings: 
+    value-protected: true
+
+  layout: 
+    sequence: 20
+    region: Expenses # 146643408773290658639
+    slot: BODY
+
+  advanced: 
+    warn-on-unsaved-changes: Page Default
+
+  source: 
+    type: Null
+    used: Only when current value in session state is null
+
+  session-state: 
+    data-type: VARCHAR2
+    storage: Per Session (Persistent)
+
+  security: 
+    session-state-protection: Unrestricted
+    store-value-encrypted-in-session-state: true
+    restricted-characters: All characters can be saved.
+
+buttons: 
+- # ====== Button: Add_Expense =================================
+  id: 154784938718402212004
+  identification: 
+    button-name: Add_Expense
+    label: Add Expense
+
+  layout: 
+    sequence: 20
+    region: Expenses # 146643408773290658639
+    slot: EDIT
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text with Icon
+    hot: true
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--iconLeft
+    icon: fa-inr
+
+  behavior: 
+    action: Redirect to Page in this Application
+    target: 
+      url: 'f?p=&APP_ID.:4:&SESSION.::&DEBUG.::P4_GROUP_ID:&P3_GROUP_ID.'
+      page: 4 # Add Expense
+      values: 
+        p4_group_id: '&P3_GROUP_ID.'
+
+    warn-on-unsaved-changes: Do Not Check
+
+- # ====== Button: View_member =================================
+  id: 154784940142701212018
+  identification: 
+    button-name: View_member
+    label: View Member
+
+  layout: 
+    sequence: 10
+    region: Expenses # 146643408773290658639
+    slot: EDIT
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text
+    hot: true
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--link
+    icon: fa-inr
+
+  behavior: 
+    action: Redirect to Page in this Application
+    target: 
+      url: 'f?p=&APP_ID.:8:&SESSION.::&DEBUG.::P8_GROUP_ID,P8_GROUP_NAME:&P3_GROUP_ID.,&P3_GROUP_NAME.'
+      page: 8 # Member
+      values: 
+        p8_group_id: '&P3_GROUP_ID.'
+        p8_group_name: '&P3_GROUP_NAME.'
+
+    warn-on-unsaved-changes: Do Not Check
+
+- # ====== Button: Balance =====================================
+  id: 154784942996780212046
+  identification: 
+    button-name: Balance
+    label: Balance
+
+  layout: 
+    sequence: 10
+    region: Expenses # 146643408773290658639
+    slot: CHANGE
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text with Icon
+    hot: true
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--iconLeft
+    icon: fa-balance-scale
+
+  behavior: 
+    action: Redirect to Page in this Application
+    target: 
+      url: 'f?p=&APP_ID.:5:&SESSION.::&DEBUG.::P5_GROUP_ID:&P3_GROUP_ID.'
+      page: 5 # Balance
+      values: 
+        p5_group_id: '&P3_GROUP_ID.'
+
+    warn-on-unsaved-changes: Do Not Check
+
+dynamic-actions: 
+- # ====== Dynamic Action: Refresh expense =====================
+  id: 154784939136775212008
+  identification: 
+    name: Refresh expense
+
+  execution: 
+    sequence: 10
+    event-scope: Static
+    type: Immediate
+
+  when: 
+    event: Dialog Closed
+    selection-type: jQuery Selector
+    jquery-selector: Body
+
+  actions: 
+  - # ====== Action: Refresh =====================================
+    id: 154784939216597212009
+    identification: 
+      action: Refresh
+
+    settings: 
+      maintain-pagination: false
+
+    affected-elements: 
+      selection-type: Region
+      region: Expenses # 146643408773290658639
+
+    execution: 
+      sequence: 10
+      event: Refresh expense # 154784939136775212008
+      fire-when-event-result-is: True
+      fire-on-initialization: false
+
+processes: 
+- # ====== Process: Get Group Name =============================
+  id: 154784938675906212003
+  identification: 
+    name: Get Group Name
+    type: Execute Code
+    execution-chain: None
+
+  source: 
+    location: Local Database
+    language: PL/SQL
+    pl/sql-code: |
+      select group_name into :P3_GROUP_NAME 
+      from group_details where group_id = :P3_GROUP_ID;
+
+  execution: 
+    sequence: 10
+    point: Before Header
+    run-process: Once Per Page Visit (default)
+

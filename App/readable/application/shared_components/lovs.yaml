@@ -1,0 +1,21 @@
+---
+- # ====== List of Values: GROUP_DETAILS.GROUP_NAME ============
+  id: 154787835518940757474
+  identification: 
+    name: GROUP_DETAILS.GROUP_NAME
+
+  subscription: 
+    version-number: 15752490115920
+
+  source: 
+    location: Local Database
+    type: Table / View
+    table-owner: Parsing Schema
+    table-name: GROUP_DETAILS
+
+  column-mapping: 
+    return: GROUP_ID
+    display: GROUP_NAME
+    default-sort: GROUP_NAME
+    sort-direction: Ascending (Nulls Last)
+

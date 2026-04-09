@@ -1,0 +1,406 @@
+---
+# ====== Page: Home ==========================================
+id: 1
+identification: 
+  name: Home
+  alias: HOME
+  title: Share Manager
+
+appearance: 
+  page-mode: Normal
+  page-template: Theme Default
+  template-options: 
+  - '#DEFAULT#'
+
+navigation-menu: 
+  override-user-interface-level: false
+
+navigation: 
+  cursor-focus: Do not focus cursor
+  warn-on-unsaved-changes: true
+
+security: 
+  authentication: Page Requires Authentication
+  deep-linking: Application Default
+  page-access-protection: Arguments Must Have Checksum
+  form-auto-complete: Off
+  browser-cache: Application Default
+
+session-management: 
+  rejoin-sessions: Application Default
+
+advanced: 
+  enable-duplicate-page-submissions: Yes - Enable page to be re-posted
+  reload-on-submit: Only for Success
+
+server-cache: 
+  caching: Disabled
+
+regions: 
+- # ====== Region: Groups ======================================
+  id: 146643407391400658625
+  identification: 
+    name: Groups
+    title: Groups
+    type: Media List
+
+  source: 
+    location: Local Database
+    type: SQL Query
+    sql-query: |
+      select grp.group_id, grp.group_name, grp.category, grp.description 
+      from group_details grp join user_group ug on grp.group_id = ug.group_id
+       join user_detail usr on ug.user_id = usr.user_id where usr.user_name = :app_user;
+
+  order-by: 
+    type: None
+
+  layout: 
+    sequence: 20
+    parent-region: No Parent
+    slot: BODY
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Standard
+    template-options: 
+    - '#DEFAULT#'
+    - t-Region--scrollBody
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  customization: 
+    customizable: Customizable and Shown By Default
+    name: Groups
+
+  attributes: 
+    appearance: 
+      display: Multiple (Report)
+
+    settings: 
+      title: GROUP_NAME
+      description: DESCRIPTION
+      display-avatar: true
+      display-badge: false
+      layout: Default
+      size: Default
+      apply-theme-colors: true
+
+    avatar: 
+      type: Image
+      image: 
+        url-column: CATEGORY
+
+      shape: Rounded
+
+    row-selection: 
+      type: None
+
+    performance: 
+      lazy-loading: false
+
+    pagination: 
+      type: Page
+      entities-per-page: 15
+      show-total-count: true
+
+    messages: 
+      when-no-data-found: No Groups created/added yet.
+      no-data-found-icon: fa-sm fa-cart-empty
+
+  columns: 
+  - # ====== Column: GROUP_ID ====================================
+    id: 146643408286133658634
+    identification: 
+      name: GROUP_ID
+
+    layout: 
+      sequence: 10
+
+    source: 
+      type: Database Column
+      database-column: GROUP_ID
+      data-type: NUMBER
+      primary-key: true
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: GROUP_NAME ==================================
+    id: 146643408391116658635
+    identification: 
+      name: GROUP_NAME
+
+    layout: 
+      sequence: 20
+
+    source: 
+      type: Database Column
+      database-column: GROUP_NAME
+      data-type: VARCHAR2
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: CATEGORY ====================================
+    id: 146643408498986658636
+    identification: 
+      name: CATEGORY
+
+    layout: 
+      sequence: 30
+
+    source: 
+      type: Database Column
+      database-column: CATEGORY
+      data-type: VARCHAR2
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  - # ====== Column: DESCRIPTION =================================
+    id: 146643408512381658637
+    identification: 
+      name: DESCRIPTION
+
+    layout: 
+      sequence: 40
+
+    source: 
+      type: Database Column
+      database-column: DESCRIPTION
+      data-type: VARCHAR2
+      primary-key: false
+
+    accessibility: 
+      value-identifies-row: false
+
+    appearance: 
+      group: false
+
+  actions: 
+  - # ====== Action: Link ========================================
+    id: 146643409858225658650
+    identification: 
+      position: Link # 354086328093939142
+
+    layout: 
+      sequence: 10
+
+    link: 
+      type: Redirect to Page in this Application
+      target: 
+        url: 'f?p=&APP_ID.:3:&SESSION.::&DEBUG.::P3_GROUP_ID,P3_GROUP_NAME:&GROUP_ID.,&GROUP_NAME.'
+        page: 3 # Expense
+        values: 
+          p3_group_id: '&GROUP_ID.'
+          p3_group_name: '&GROUP_NAME.'
+
+- # ====== Region: Share Manager ===============================
+  id: 154288240361229460373
+  identification: 
+    name: Share Manager
+    type: Static Content
+
+  layout: 
+    sequence: 10
+    parent-region: No Parent
+    slot: REGION_POSITION_01
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    template: Hero
+    template-options: 
+    - '#DEFAULT#'
+    render-components: Above Content
+
+  accessibility: 
+    use-landmark: true
+    landmark-type: Template Default
+
+  image: 
+    file-url: '#APP_FILES#icons/app-icon-512.png'
+
+  advanced: 
+    region-display-selector: false
+    exclude-title-from-translation: false
+
+  customization: 
+    customizable: Not Customizable By End Users
+
+  attributes: 
+    settings: 
+      output-as: HTML
+      expand-shortcuts: false
+
+buttons: 
+- # ====== Button: New_group ===================================
+  id: 146643408620839658638
+  identification: 
+    button-name: New_group
+    label: New Group
+
+  layout: 
+    sequence: 20
+    region: Groups # 146643407391400658625
+    slot: EDIT
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text with Icon
+    hot: true
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--iconLeft
+
+  behavior: 
+    action: Redirect to Page in this Application
+    target: 
+      url: 'f?p=&APP_ID.:2:&SESSION.::&DEBUG.:::'
+      page: 2 # New Group
+
+    warn-on-unsaved-changes: Do Not Check
+
+- # ====== Button: Spent_Category ==============================
+  id: 154784943278246212049
+  identification: 
+    button-name: Spent_Category
+    label: Spent Category
+
+  layout: 
+    sequence: 10
+    region: Groups # 146643407391400658625
+    slot: EDIT
+    start-new-layout: false
+    start-new-row: true
+    column: Automatic
+    new-column: true
+    column-span: Automatic
+
+  appearance: 
+    button-template: Text with Icon
+    hot: false
+    template-options: 
+    - '#DEFAULT#'
+    - t-Button--iconLeft
+    icon: fa-pie-chart-20
+
+  behavior: 
+    action: Redirect to Page in this Application
+    target: 
+      url: 'f?p=&APP_ID.:11:&SESSION.::&DEBUG.:::'
+      page: 11 # chart
+
+    warn-on-unsaved-changes: Do Not Check
+
+dynamic-actions: 
+- # ====== Dynamic Action: Refresh group =======================
+  id: 146643409023948658642
+  identification: 
+    name: Refresh group
+
+  execution: 
+    sequence: 10
+    event-scope: Static
+    type: Immediate
+
+  when: 
+    event: Dialog Closed
+    selection-type: jQuery Selector
+    jquery-selector: Body
+
+  actions: 
+  - # ====== Action: Refresh =====================================
+    id: 146643409167493658643
+    identification: 
+      action: Refresh
+
+    settings: 
+      maintain-pagination: false
+
+    affected-elements: 
+      selection-type: Region
+      region: Groups # 146643407391400658625
+
+    execution: 
+      sequence: 10
+      event: Refresh group # 146643409023948658642
+      fire-when-event-result-is: True
+      fire-on-initialization: false
+
+processes: 
+- # ====== Process: Load User ==================================
+  id: 146643407197570658623
+  identification: 
+    name: Load User
+    type: Execute Code
+    execution-chain: None
+
+  source: 
+    location: Local Database
+    language: PL/SQL
+    pl/sql-code: |
+      declare 
+          v_user_id number;
+      Begin
+          select nvl(max(user_id),-1)
+                  into v_user_id
+                  from user_detail 
+                  where user_name = :app_user;
+           
+           If v_user_id = -1
+              Then
+                  insert into user_detail(
+                      user_id,
+                      user_name,
+                      first_name,
+                      last_name,
+                      email
+                  )
+                  select
+                      seq_usr_id.nextval,
+                      awpu.user_name,
+                      awpu.first_name,
+                      awpu.last_name,
+                      lower(awpu.email)
+                  from apex_workspace_apex_users awpu
+                  where user_name = :app_user;
+            End IF;
+      
+      End;
+
+  execution: 
+    sequence: 10
+    point: Before Header
+    run-process: Once Per Page Visit (default)
+
