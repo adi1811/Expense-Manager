@@ -39,7 +39,7 @@ The system is designed using a normalized relational schema:
 * `EXPENSE` → Stores expense details
 * `AMOUNT_DETAIL` → Stores split transactions (borrower & lender)
 
-![ER Diagram](Docs/Documents/ER_diagram.jpg)
+![ER Diagram](Docs/Documents/ER_Diagram.jpg)
 
 ![Data Flow Diagram](Docs/Documents/DFD_Diagram.jpg)
 
