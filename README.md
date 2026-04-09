@@ -136,5 +136,4 @@ The system is designed using a normalized relational schema:
 ---
 
 ## 👨‍💻 Author
-
-Aditya Pratap Singh
+***Aditya Pratap Singh***
